@@ -1,0 +1,52 @@
+services:
+  mysql:
+    image: mysql:8.0.33
+    container_name: yunrui-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: yunrui_edu
+      TZ: Asia/Shanghai
+    ports:
+      - "13307:3306"
+    volumes:
+      - yunrui_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: yunrui-redis
+    restart: unless-stopped
+    ports:
+      - "16380:6379"
+    volumes:
+      - yunrui_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: yunrui-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    volumes:
+      - yunrui_rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  yunrui_mysql_data:
+  yunrui_redis_data:
+  yunrui_rabbitmq_data:

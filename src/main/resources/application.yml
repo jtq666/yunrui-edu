@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: yunrui-edu-interview
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 210MB
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:13307/yunrui_edu?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5673}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    publisher-confirm-type: simple
+    listener:
+      simple:
+        acknowledge-mode: auto
+        default-requeue-rejected: false
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:16380}
+
+server:
+  port: ${SERVER_PORT:18080}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:yunrui-education-interview-secret-key-change-in-production}
+  learning-progress:
+    persist-delay-ms: 20000
+  promotion:
+    claim-rate-limit-per-minute: 10
+  media:
+    root: ${MEDIA_ROOT:F:/shixi/yunrui-edu-interview/frontend/src/assets}
+
+logging:
+  level:
+    com.yunrui.edu: info
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

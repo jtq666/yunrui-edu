@@ -1,0 +1,1 @@
+ALTER TABLE edu_quiz_question ADD COLUMN active TINYINT(1) NOT NULL DEFAULT 1;

@@ -1,0 +1,77 @@
+import axios from 'axios'
+
+const api = axios.create({ baseURL: '/api', timeout: 10000 })
+
+api.interceptors.request.use(config => {
+  const token = sessionStorage.getItem('yunrui_token')
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+export const register = data => api.post('/auth/register', data).then(r => r.data)
+export const login = data => api.post('/auth/login', data).then(r => r.data)
+export const courses = () => api.get('/courses').then(r => r.data)
+export const coursePage = params => api.get('/courses/page', { params }).then(r => r.data)
+export const categories = () => api.get('/courses/categories').then(r => r.data)
+export const course = id => api.get(`/courses/${id}`).then(r => r.data)
+export const claimCoupon = (userId, couponId) => api.post('/coupons/claim', { userId, couponId }).then(r => r.data)
+export const bestPlan = (userId, orderAmount) => api.post('/coupons/best-plan', { userId, orderAmount }).then(r => r.data)
+export const couponPlans = (userId, courseId) => api.post('/coupons/plans', { userId, courseId }).then(r => r.data)
+export const createOrder = (userId, courseId, couponIds) => api.post('/orders', { userId, courseId, couponIds }).then(r => r.data)
+export const orders = userId => api.get(`/users/${userId}/orders`).then(r => r.data)
+export const pay = (orderId, paidAmount) => api.post('/payments/callback', {
+  orderId, paidAmount, transactionId: `web-${orderId}-${Date.now()}`
+}).then(r => r.data)
+export const cancelOrder = (userId, orderId) => api.post(`/orders/${orderId}/cancel`, { userId })
+export const myCourses = userId => api.get(`/users/${userId}/courses`).then(r => r.data)
+export const reportProgress = data => api.post('/learning-progress', data).then(r => r.data)
+export const progress = (userId, courseId) => api.get(`/learning-progress/users/${userId}/courses/${courseId}`).then(r => r.data)
+export const addPoints = data => api.post('/points/events', data).then(r => r.data)
+export const topRanks = season => api.get(`/points/boards/${season}`).then(r => r.data)
+export const profile = userId => api.get(`/users/${userId}/profile`).then(r => r.data)
+export const updateProfile = (userId, data) => api.put(`/users/${userId}/profile`, data).then(r => r.data)
+export const cart = userId => api.get(`/users/${userId}/cart`).then(r => r.data)
+export const addCart = (userId, courseId) => api.post(`/users/${userId}/cart/${courseId}`)
+export const removeCart = (userId, courseId) => api.delete(`/users/${userId}/cart/${courseId}`)
+export const favorites = userId => api.get(`/users/${userId}/favorites`).then(r => r.data)
+export const addFavorite = (userId, courseId) => api.post(`/users/${userId}/favorites/${courseId}`)
+export const removeFavorite = (userId, courseId) => api.delete(`/users/${userId}/favorites/${courseId}`)
+export const notes = (userId, courseId) => api.get(`/users/${userId}/notes`, { params: { courseId } }).then(r => r.data)
+export const createNote = (userId, data) => api.post(`/users/${userId}/notes`, data).then(r => r.data)
+export const deleteNote = (userId, noteId) => api.delete(`/users/${userId}/notes/${noteId}`)
+export const refunds = userId => api.get(`/users/${userId}/refunds`).then(r => r.data)
+export const applyRefund = (userId, data) => api.post(`/users/${userId}/refunds`, data).then(r => r.data)
+export const adminRefunds = (status = 'PENDING') => api.get('/admin/refunds', { params: { status } }).then(r => r.data)
+export const approveRefund = (refundId, reason) => api.post(`/admin/refunds/${refundId}/approve`, { reason }).then(r => r.data)
+export const rejectRefund = (refundId, reason) => api.post(`/admin/refunds/${refundId}/reject`, { reason }).then(r => r.data)
+export const reviews = courseId => api.get(`/courses/${courseId}/reviews`).then(r => r.data)
+export const createReview = (courseId, data) => api.post(`/courses/${courseId}/reviews`, data).then(r => r.data)
+export const adminCourses = () => api.get('/admin/courses').then(r => r.data)
+export const createAdminCourse = data => api.post('/admin/courses', data).then(r => r.data)
+export const changeCourseStatus = (courseId, value) => api.post(`/admin/courses/${courseId}/status`, null, { params: { value } }).then(r => r.data)
+export const videoTicket = (userId, sectionId) => api.post(`/videos/sections/${sectionId}/ticket`, { userId }).then(r => r.data)
+export const adminSections = courseId => api.get(`/admin/courses/${courseId}/sections`).then(r => r.data)
+export const createAdminSection = (courseId, data) => api.post(`/admin/courses/${courseId}/sections`, data).then(r => r.data)
+export const deleteAdminSection = sectionId => api.delete(`/admin/courses/sections/${sectionId}`)
+export const uploadSectionVideo = (sectionId, file, onProgress) => { const form=new FormData();form.append('file',file);return api.post(`/admin/courses/sections/${sectionId}/video`,form,{headers:{'Content-Type':'multipart/form-data'},onUploadProgress:e=>onProgress?.({percent:e.total?e.loaded/e.total*100:0})}).then(r=>r.data) }
+export const myQuestions = (userId, courseId) => api.get(`/users/${userId}/questions`, { params: { courseId } }).then(r => r.data)
+export const askQuestion = (userId, data) => api.post(`/users/${userId}/questions`, data).then(r => r.data)
+export const adminQuestions = () => api.get('/admin/questions').then(r => r.data)
+export const answerQuestion = (id, answer) => api.post(`/admin/questions/${id}/answer`, { answer }).then(r => r.data)
+export const quizzes = (userId, sectionId) => api.get(`/users/${userId}/quizzes`, { params: { sectionId } }).then(r => r.data)
+export const submitQuiz = (userId, questionId, selectedOption) => api.post(`/users/${userId}/quizzes/${questionId}/submit`, { selectedOption }).then(r => r.data)
+export const notifications = userId => api.get(`/users/${userId}/notifications`).then(r => r.data)
+export const readNotification = (userId, id) => api.post(`/users/${userId}/notifications/${id}/read`)
+export const changePassword = (userId, data) => api.post(`/users/${userId}/security/password`, data)
+export const dashboard = () => api.get('/admin/dashboard').then(r => r.data)
+export const adminQuizzes = sectionId => api.get('/admin/quiz-questions', { params: { sectionId } }).then(r => r.data)
+export const createAdminQuiz = data => api.post('/admin/quiz-questions', data).then(r => r.data)
+export const disableAdminQuiz = id => api.delete(`/admin/quiz-questions/${id}`)
+export const adminUsers = params => api.get('/admin/users', { params }).then(r => r.data)
+export const updateAdminUser = (id, data) => api.put(`/admin/users/${id}`, data).then(r => r.data)
+export const completion = (userId, courseId) => api.get(`/users/${userId}/courses/${courseId}/completion`).then(r => r.data)
+export const issueCertificate = (userId, courseId) => api.post(`/users/${userId}/courses/${courseId}/certificate`).then(r => r.data)
+
+export function errorMessage(error) {
+  return error?.response?.data?.message || error?.message || '操作失败，请稍后再试'
+}
